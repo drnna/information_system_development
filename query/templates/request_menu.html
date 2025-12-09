@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Меню запросов - Cinema</title>
+    <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="header">
+        <h1>Cinema</h1>
+
+        <div class="header-menu">
+            <span class="user-info">Пользователь: {{ session.user_login }} ({{ session.user_group }})</span>
+            <a href="{{ url_for('auth_bp.auth_logout') }}" class="exit-btn">Выход из системы</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="auth-form">
+
+            {% if no_access %}
+                <h2>Нет доступных функций</h2>
+                <div class="error-message" style="margin: 1.5rem 0; padding: 1.5rem; background: #f8f9fa; border-radius: 10px;">
+                    <p>К сожалению, для вашей роли "{{ user_group }}" нет доступных функций в системе.</p>
+                    <p style="margin-top: 0.5rem;">Обратитесь к администратору для получения доступа.</p>
+                </div>
+                <a href="{{ url_for('main_menu') }}" class="back-btn">Назад в главное меню</a>
+
+            {% elif error %}
+                <h2>Ошибка</h2>
+                <div class="error-message" style="margin: 1.5rem 0; padding: 1.5rem; background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);">
+                    <p>{{ error }}</p>
+                </div>
+                <a href="{{ url_for('main_menu') }}" class="back-btn">Назад в главное меню</a>
+
+            {% elif session.user_id and available_queries %}
+
+                <p style="margin: 1rem 0; color: #666;"> Доступно запросов: <strong>{{ available_queries|length }}</strong></p>
+
+                <h3 style="margin: 2rem 0 1rem 0; color: #667eea;">Выберите запрос:</h3>
+
+                {% if available_queries %}
+                    <div style="display: flex; flex-direction: column; gap: 1rem; margin: 1.5rem 0;">
+                        {% for query_type, config in available_queries.items() %}
+                        <a href="{{ url_for('query_bp.query_input', query_type=query_type) }}"
+                           class="query-btn"
+                           style="text-align: left; padding: 1rem 1.5rem;">
+                            <div style="font-weight: bold; font-size: 1.1rem;">{{ config.name }}</div>
+
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="error-message" style="margin: 1.5rem 0; padding: 1.5rem; background: #f8f9fa; border-radius: 10px;">
+                        <p>В системе пока нет доступных запросов.</p>
+                    </div>
+                {% endif %}
+
+                <div style="margin-top: 2rem;">
+                    <a href="{{ url_for('main_menu') }}" class="exit-btn">Назад в главное меню</a>
+                </div>
+
+            {% else %}
+                <h2>Ошибка доступа</h2>
+                <div class="error-message" style="margin: 1.5rem 0; padding: 1.5rem; background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);">
+                    <p>Не удалось загрузить доступные запросы.</p>
+                </div>
+                <a href="{{ url_for('query_bp.cinema_handle') }}" class="back-button">Назад к запросам</a>
+                <a href="{{ url_for('main_menu') }}" class="exit-btn">Назад в главное меню</a>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

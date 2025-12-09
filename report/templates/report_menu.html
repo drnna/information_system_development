@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Система отчетов - Cinema</title>
+    <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="header">
+        <h1>Cinema</h1>
+        <div class="header-menu">
+            <span class="user-info">Пользователь: {{ session.user_login }} ({{ session.user_group }})</span>
+            <a href="{{ url_for('auth_bp.auth_logout') }}" class="exit-btn">Выход из системы</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="main-menu">
+            <h2>Система отчетов</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="functions-grid">
+                <a href="{{ url_for('report_bp.create_report_handler') }}" class="query-btn">Создать отчет</a>
+                <a href="{{ url_for('report_bp.view_reports') }}" class="query-btn">Просмотреть отчеты</a>
+            </div>
+
+
+               <a href="{{ url_for('main_menu') }}" class="exit-btn">Назад в главное меню</a>
+
+        </div>
+    </div>
+</body>
+</html>

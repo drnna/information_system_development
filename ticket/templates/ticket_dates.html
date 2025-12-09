@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Продажа билетов</title>
+    <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet">
+</head>
+<body>
+    <div class="header">
+        <h1>Cinema </h1>
+        <div class="header-menu">
+                <span class="user-info">Пользователь: {{ session.user_login }} ({{ session.user_group }})</span>
+                <a href="{{ url_for('main_menu') }}" class="exit-btn">Назад в главное меню</a>
+                <a href="{{ url_for('auth_bp.auth_logout') }}" class="exit-btn">Выход из системы</a>
+        </div>
+    </div>
+
+    <div class="content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <div class="dates-container">
+            {% if dates %}
+                <div class="dates-grid">
+                    {% for date in dates %}
+                        <div class="date-card">
+                            <h3>📅 Доступные сеансы</h3>
+                            <div class="date-display">
+                                {{ date.session_date }}
+                            </div>
+                            <form method="POST" action="{{ url_for('ticket_bp.select_tickets') }}">
+                                <input type="hidden" name="selected_date" value="{{ date.session_date }}">
+                                <button type="submit" class="btn primary">
+                                    🎭 Выбрать сеанс
+                                </button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>😔 Нет доступных дат</h3>
+                    <p style="font-size: 1.2em; color: #666; margin-bottom: 30px;">
+                        Все билеты распроданы или сеансы не созданы
+                    </p>
+                    <a href="{{ url_for('main_menu') }}" class="exit-btn">Вернуться в главное меню</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

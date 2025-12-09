@@ -1,0 +1,16 @@
+{
+    "admin": [
+      "reports_create",
+      "reports_view",
+      "query_bp",
+      "ticket_bp"
+    ],
+
+    "manager": [
+      "reports_create"
+    ],
+
+    "director": [
+      "reports_view"
+    ]
+}

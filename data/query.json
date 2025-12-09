@@ -1,0 +1,85 @@
+{
+  "queries": {
+    "session": {
+      "name": "Сеансы без проданных билетов",
+      "sql_file": "session_without_ticket.sql",
+      "input_template": {
+        "title": "Сеансы без проданных билетов",
+        "fields": [
+          {
+            "name": "year",
+            "type": "number",
+            "min": "2000",
+            "max": "2030",
+            "placeholder": "Введите год",
+            "required": true
+          }
+        ]
+      },
+      "result_template": {
+        "columns": [
+          "ID сеанса",
+          "Дата",
+          "Время",
+          "Фильм",
+          "Зал",
+          "Количество мест"
+        ],
+        "empty_message": "Сеансов без проданных билетов за указанный год не найдено."
+      }
+    },
+    "bestmovie": {
+      "name": "Лучший фильм года",
+      "sql_file": "bestmovie.sql",
+      "input_template": {
+        "title": "Введите год для отображения top фильма",
+        "fields": [
+          {
+            "name": "year",
+            "label": "ГОД",
+            "type": "text",
+            "placeholder": "Например: 2024",
+            "required": true
+          }
+        ]
+      },
+      "result_template": {
+        "columns": [
+          "ID сеанса",
+          "Дата",
+          "Время",
+          "Зал",
+          "Фильм",
+          "Режиссер",
+          "Билетов продано"
+        ],
+        "empty_message": "Фильмов не найдено за указанный год."
+      }
+    },
+    "hall": {
+      "name": "Сведения о зале",
+      "sql_file": "hall.sql",
+      "input_template": {
+        "fields": [
+          {
+            "name": "hall_id",
+            "label": "Введите ID зала для отчета",
+            "type": "number",
+            "required": true
+          }
+        ]
+      },
+      "result_template": {
+        "columns": [
+          "ID зала",
+          "Название зала",
+          "Количество мест",
+          "Всего проведенных сеансов",
+          "Общее количество проданных билетов",
+          "Общая выручка"
+        ],
+        "empty_message": "Данные по указанному залу не найдены."
+      }
+    }
+  }
+}

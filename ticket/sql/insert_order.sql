@@ -1,0 +1,1 @@
+INSERT INTO user_order (u_id) VALUES (%s);

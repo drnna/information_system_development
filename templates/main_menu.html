@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Информационная система супермаркет</title>
+    <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="header">
+        <h1>Cinema</h1>
+        <div class="header-menu">
+             <a href="{{ url_for('auth_bp.auth_logout') }}" class="exit-btn">Выход из системы</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="main-menu">
+            {% if session.user_id %}
+                <h2>Добро пожаловать, {{ session.user_login }}!</h2>
+                <p>Вы авторизованы как: {{ session.user_group }}</p>
+
+                {% if session.user_group in ['admin', 'manager', 'director'] %}
+                    <h3>Доступные функции:</h3>
+                    <div class="functions-grid">
+                        {% if session.user_group in ['admin'] %}
+                            <a href="{{ url_for('query_bp.cinema_handle') }}" class="query-btn">Работа с запросами</a>
+                            <a href="{{ url_for('report_bp.report_menu') }}" class="query-btn">Отчеты</a>
+                            <a href="{{ url_for('ticket_bp.tickets_main') }}" class="query-btn">🎫 Продажа билетов</a>
+                        {% endif %}
+                        {% if session.user_group in ['manager'] %}
+                            <a href="{{ url_for('query_bp.cinema_handle') }}" class="query-btn">Работа с запросами</a>
+                            <a href="{{ url_for('report_bp.report_menu') }}" class="query-btn">Отчеты</a>
+                            <a href="{{ url_for('ticket_bp.tickets_main') }}" class="query-btn">🎫 Продажа билетов</a>
+                        {% endif %}
+                        {% if session.user_group in ['director'] %}
+                            <a href="{{ url_for('query_bp.cinema_handle') }}" class="query-btn">Работа с запросами</a>
+                            <a href="{{ url_for('report_bp.report_menu') }}" class="query-btn">Отчеты</a>
+                            <a href="{{ url_for('ticket_bp.tickets_main') }}" class="query-btn">🎫 Продажа билетов</a>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="no-access-message">
+                        <h3>Нет доступных функций</h3>
+                        <p>К сожалению, для вашей роли "{{ session.user_group }}" нет доступных функций в системе.</p>
+                        <p>Обратитесь к администратору для получения доступа.</p>
+                    </div>
+                {% endif %}
+            {% else %}
+                <h2>Добро пожаловать в систему</h2>
+                <p>Для работы с системой необходимо авторизоваться</p>
+                <a href="{{ url_for('auth_bp.auth_index') }}" class="query-btn">Авторизоваться</a>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+</body>
+</html>

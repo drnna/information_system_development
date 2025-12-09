@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Ошибка</title>
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="header">
+        <h1>Cinema</h1>
+        <div class="header-menu">
+            <span class="user-info">Пользователь: {{ session.user_login }} ({{ session.user_group }})</span>
+            <a href="{{ url_for('auth_bp.auth_logout') }}" class="exit-btn">Выход из системы</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="auth-form">
+            <h2>Ошибка</h2>
+
+            <div class="error-message" style="margin: 2rem 0; padding: 1.5rem; background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);">
+                <p style="font-size: 1.2rem; font-weight: 600;">{{ error_message }}</p>
+            </div>
+
+            <div class="action-buttons" style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <a href="{{ back_url }}" class="back-btn" style="flex: 1;">Вернуться к вводу</a>
+                <a href="{{ url_for('main_menu') }}" class="exit-btn" style="flex: 1;">Назад в главное меню</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ report_title }} - Cinema</title>
+    <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="header">
+        <h1>Cinema</h1>
+        <div class="header-menu">
+            <span class="user-info">Пользователь: {{ session.user_login }} ({{ session.user_group }})</span>
+            <a href="{{ url_for('auth_bp.auth_logout') }}" class="exit-btn">Выход из системы</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <h2>{{ report_title }} за {{ month }}/{{ year }}</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Отладочная информация -->
+        {% if debug_mode %}
+        <div class="debug-info">
+            <p><strong>Отладка:</strong></p>
+            <p>Колонки: {{ column_names }}</p>
+            <p>Количество записей: {{ report_details|length }}</p>
+            <p>Первая запись: {{ report_details[0] if report_details else 'нет данных' }}</p>
+            <p>Сводка включена: {{ show_summary }}</p>
+            <p>Данные сводки: {{ summary_data }}</p>
+        </div>
+        {% endif %}
+
+        {% if report_details and report_details|length > 0 %}
+            <table border="1">
+                <thead>
+                    <tr class="tab_title">
+                        {% for column_name in column_names %}
+                            <td>{{ column_name }}</td>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detail in report_details %}
+                    <tr>
+                        {% for value in detail %}
+                            <td>{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+            <div class="no-data">
+                <p>Детали отчета за указанный период не найдены.</p>
+                <p>Возможно, отчеты за этот период еще не созданы.</p>
+            </div>
+        {% endif %}
+
+        <div class="action-buttons">
+            <a href="{{ url_for('report_bp.view_reports') }}" class="back-button">Новый поиск</a>
+            <a href="{{ url_for('report_bp.report_menu') }}" class="back-button">Назад в меню отчетов</a>
+            <a href="{{ url_for('main_menu') }}" class="exit-btn">Назад в главное меню</a>
+        </div>
+    </div>
+</body>
+</html>

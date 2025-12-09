@@ -1,0 +1,46 @@
+{
+  "reports": {
+    "session": {
+      "name": "Отчет о сеансах",
+      "table_name": "session_report",
+      "procedure_name": "CreateSessionReport",
+      "columns": [
+        "sr_id",
+        "hall_name",
+        "hall_id",
+        "sr_month",
+        "sr_year",
+        "sr_amount"
+      ],
+      "column_names": [
+        "ID отчета",
+        "Название зала",
+        "ID зала",
+        "Месяц",
+        "Год",
+        "Количество сеансов"
+      ]
+    },
+    "revenue": {
+      "name": "Отчет о выручке",
+      "table_name": "revenue_report",
+      "procedure_name": "CreateRevenueReport",
+      "columns": [
+        "rev_id",
+        "revenue",
+        "ses_amount",
+        "ticket_amount",
+        "rev_month",
+        "rev_year"
+      ],
+      "column_names": [
+        "ID отчета",
+        "Выручка",
+        "Количество сеансов",
+        "Количество билетов",
+        "Месяц",
+        "Год"
+      ]
+    }
+  }
+}

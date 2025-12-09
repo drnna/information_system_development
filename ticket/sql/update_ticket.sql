@@ -1,0 +1,1 @@
+UPDATE ticket SET is_sold = 1 WHERE t_id = %s;

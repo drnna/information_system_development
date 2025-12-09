@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ query_config.name }}</title>
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="header">
+        <h1>Cinema</h1>
+        <div class="header-menu">
+            <span class="user-info">Пользователь: {{ session.user_login }} ({{ session.user_group }})</span>
+            <a href="{{ url_for('auth_bp.auth_logout') }}" class="exit-btn">Выход из системы</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="auth-form wide-form">
+            <div class="query-header">
+                <h2>{{ query_config.name }}</h2>
+                {% if query_config.description %}
+                <p class="query-description">{{ query_config.description }}</p>
+                {% endif %}
+            </div>
+
+            {% if data and data|length > 0 %}
+            <div class="table-wrapper">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            {% for column in query_config.result_template.columns %}
+                            <th>{{ column }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                        <tr>
+                            {% for cell in row %}
+                            <td>{{ cell }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="results-count">
+                Найдено записей: <strong>{{ data|length }}</strong>
+            </div>
+            {% else %}
+                <div class="no-data">
+                    <h3>Данные не найдены</h3>
+                    <p>{{ query_config.result_template.empty_message }}</p>
+                    <p>Попробуйте изменить параметры поиска или проверьте данные.</p>
+                </div>
+            {% endif %}
+
+                <a href="{{ url_for('query_bp.query_input', query_type=query_type) }}" class="back-btn">Новый запрос</a>
+                <a href="{{ url_for('query_bp.cinema_handle') }}" class="back-button">Назад к запросам</a>
+                <a href="{{ url_for('main_menu') }}" class="exit-btn">Назад в главное меню</a>
+
+        </div>
+    </div>
+</body>
+</html>
+

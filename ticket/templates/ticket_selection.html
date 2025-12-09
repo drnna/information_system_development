@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Выбор билетов - {{ selected_date }}</title>
+    <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet">
+    <style>
+        .cinema-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .selection-section {
+            flex: 2;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .basket-section {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .cinema-screen {
+            text-align: center;
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .seats-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .row-label {
+            font-weight: bold;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .seat {
+            width: 35px;
+            height: 35px;
+            border: 2px solid #3498db;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .seat:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .seat.available {
+            background: white;
+            color: #333;
+        }
+
+        .seat.selected {
+            background: #27ae60;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        .seat.sold {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+            cursor: not-allowed;
+        }
+
+        .seat.sold:hover {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+
+        .session-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .basket-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+
+        .basket-item:last-child {
+            border-bottom: none;
+        }
+
+        .total-sum {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #eee;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .session-card {
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .session-card.active {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+
+        .seat-form {
+            display: inline;
+        }
+
+        .seat-button {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 12px;
+            color: inherit;
+        }
+
+        .seat-button:disabled {
+            cursor: not-allowed;
+        }
+
+        .info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Cinema </h1>
+        <div class="header-menu">
+            <span class="user-info">Пользователь: {{ session.user_login }} ({{ session.user_group }})</span>
+                <a href="{{ url_for('ticket_bp.tickets_main') }}" class="back-button">Назад к датам</a>
+                <a href="{{ url_for('main_menu') }}" class="exit-btn">Назад в главное меню</a>
+                <a href="{{ url_for('auth_bp.auth_logout') }}" class="exit-btn">Выход из системы</a>
+
+        </div>
+    </div>
+
+    <div class="content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <div class="cinema-container">
+            <div class="selection-section">
+                <h2>🎭 Выбор сеансов и мест</h2>
+
+                {% if sessions %}
+                    <div class="session-info">
+                        <h3>Доступные сеансы на {{ selected_date }}</h3>
+                        <p>Выберите сеанс для просмотра доступных мест</p>
+                    </div>
+
+                    <div>
+                        {% for session_item in sessions %}
+                            <div class="session-card {% if session_item.session_id == session_id|int %}active{% endif %}">
+                                <h3>{{ session_item.movie_title }}</h3>
+                                <p>🕒 {{ session_item.time }} | 🎭 {{ session_item.hall_name }}</p>
+                                <p>🎫 {{ session_item.available_tickets }}/{{ session_item.total_seats }}</p>
+                                <form method="POST" action="{{ url_for('ticket_bp.select_tickets') }}">
+                                    <input type="hidden" name="selected_date" value="{{ selected_date }}">
+                                    <input type="hidden" name="session_id" value="{{ session_item.session_id }}">
+                                    <button type="submit" class="btn primary">
+                                        {{ 'Выбрать этот сеанс' if session_item.available_tickets > 0 else 'Распродан' }}
+                                    </button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if tickets and session_id %}
+                        <div class="session-info">
+                            <h3>{{ tickets[0].movie_title }}</h3>
+                            <p>{{ tickets[0].hall_name }} </p>
+                        </div>
+
+                        <div class="cinema-screen">
+                            🎬 ЭКРАН 🎬
+                        </div>
+
+                        <div class="legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: white; border: 2px solid #3498db;"></div>
+                                <span>Свободно</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #27ae60;"></div>
+                                <span>В корзине</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #e74c3c;"></div>
+                                <span>Продан</span>
+                            </div>
+                        </div>
+
+                        <div class="seats-grid">
+                            {% set rows = {} %}
+                            {% for ticket in tickets %}
+                                {% if ticket.riad not in rows %}
+                                    {% set _ = rows.update({ticket.riad: []}) %}
+                                {% endif %}
+                                {% set _ = rows[ticket.riad].append(ticket) %}
+                            {% endfor %}
+
+                            {% set basket_ticket_ids = [] %}
+                            {% for basket_item in basket.values() %}
+                                {% set _ = basket_ticket_ids.append(basket_item.ticket_id) %}
+                            {% endfor %}
+
+                            {% for riad in rows.keys()|sort %}
+                                <div class="row">
+                                    <div class="row-label">Ряд {{ riad }}</div>
+                                    {% for ticket in rows[riad]|sort(attribute='seat') %}
+                                        {% set is_in_basket = ticket.ticket_id in basket_ticket_ids %}
+
+                                        {% if ticket.is_sold == 1 %}
+                                            {% set seat_class = 'sold' %}
+                                            {% set seat_title = 'Продан - Ряд ' ~ ticket.riad ~ ', Место ' ~ ticket.seat %}
+                                            {% set show_form = false %}
+                                        {% elif is_in_basket %}
+                                            {% set seat_class = 'selected' %}
+                                            {% set seat_title = 'В корзине - Ряд ' ~ ticket.riad ~ ', Место ' ~ ticket.seat ~ ' - ' ~ ticket.price ~ ' руб.' %}
+                                            {% set show_form = false %}
+                                        {% else %}
+                                            {% set seat_class = 'available' %}
+                                            {% set seat_title = 'Свободно - Ряд ' ~ ticket.riad ~ ', Место ' ~ ticket.seat ~ ' - ' ~ ticket.price ~ ' руб.' %}
+                                            {% set show_form = true %}
+                                        {% endif %}
+
+                                        <div class="seat {{ seat_class }}" title="{{ seat_title }}">
+                                            {% if show_form %}
+                                                <form class="seat-form" method="POST" action="{{ url_for('ticket_bp.add_ticket') }}">
+                                                    <input type="hidden" name="session_id" value="{{ session_id }}">
+                                                    <input type="hidden" name="ticket_id" value="{{ ticket.ticket_id }}">
+                                                    <input type="hidden" name="selected_date" value="{{ selected_date }}">
+                                                    <button type="submit" class="seat-button">
+                                                        {{ ticket.seat }}
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                {{ ticket.seat }}
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="info">
+                            <p><strong>Инструкция:</strong> Нажмите на свободное место (белое), чтобы добавить его в корзину. Зеленые места уже в корзине. Красные места проданные.</p>
+                        </div>
+                    {% elif session_id %}
+                        <div class="empty-state">
+                            <h3>Нет доступных билетов для этого сеанса</h3>
+                            <p>Все билеты распроданы</p>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="empty-state">
+                        <h3>Нет доступных сеансов</h3>
+                        <a href="{{ url_for('ticket_bp.tickets_main') }}" class="btn">Назад к датам</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="basket-section">
+                <h2>🛒 Корзина билетов</h2>
+                <div class="actions">
+                    <form method="POST" action="{{ url_for('ticket_bp.save_order') }}" style="display: inline;">
+                        <input type="hidden" name="selected_date" value="{{ selected_date }}">
+                        <input type="hidden" name="session_id" value="{{ session_id if session_id else '' }}">
+                        <button type="submit" class="btn success" {% if not basket %}disabled{% endif %}>
+                            ✅ Оформить заказ
+                        </button>
+                    </form>
+
+                    <form method="POST" action="{{ url_for('ticket_bp.clear_basket_route') }}" style="display: inline;">
+                        <input type="hidden" name="selected_date" value="{{ selected_date }}">
+                        <input type="hidden" name="session_id" value="{{ session_id if session_id else '' }}">
+                        <button type="submit" class="btn danger" {% if not basket %}disabled{% endif %}>
+                            🗑️ Очистить корзину
+                        </button>
+                    </form>
+                </div>
+
+                {% if basket %}
+                    <div class="basket-items">
+                        {% for ticket in basket.values() %}
+                            <div class="basket-item">
+                                <h4>{{ ticket.movie_title }}</h4>
+                                <p>{{ ticket.hall_name }} | {{ ticket.session_date }} {{ ticket.time }}</p>
+                                <p>Ряд {{ ticket.riad }}, Место {{ ticket.seat }}</p>
+                                <p><strong>{{ ticket.price }} руб.</strong></p>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="total-sum">
+                        Итого: {{ basket.values()|selectattr('price')|map(attribute='price')|map('int')|sum }} руб.
+                        <br>
+                        <small>Билетов: {{ basket|length }}</small>
+                    </div>
+                {% else %}
+                    <div class="empty-state" style="padding: 20px; text-align: center;">
+                        <p>Корзина пуста</p>
+                        <p>Добавьте билеты из доступных мест</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

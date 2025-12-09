@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Доступ запрещен</title>
+  <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="header">
+        <h1>Cinema</h1>
+        <div class="header-menu">
+            {% if session.user_id %}
+                <span class="user-info">Пользователь: {{ session.user_login }} ({{ session.user_group }})</span>
+            {% endif %}
+            <a href="{{ url_for('auth_bp.auth_logout') }}" class="exit-btn">Выход из системы</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="error-message">
+            <h2>Доступ запрещен</h2>
+            <p> У вас нет прав доступа для работы с этой категорией &#129488</p>
+        </div>
+
+        <div class="main-menu">
+            <a href="{{ url_for('main_menu') }}" class="back-button">Главное меню</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ query_config.input_template.title }}</title>
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="header">
+        <h1>Cinema</h1>
+        <div class="header-menu">
+            <span class="user-info">Пользователь: {{ session.user_login }} ({{ session.user_group }})</span>
+            <a href="{{ url_for('auth_bp.auth_logout') }}" class="exit-btn">Выход из системы</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="auth-form">
+            <h2>{{ query_config.name }}</h2>
+
+            {% if query_config.description %}
+            <p class="query-description">{{ query_config.description }}</p>
+            {% endif %}
+
+            <form action="{{ url_for('query_bp.query_result', query_type=query_type) }}" method="post">
+                {% for field in query_config.input_template.fields %}
+                <div class="form-group">
+                    {% if field.label %}
+                    <label for="{{ field.name }}">
+                        {{ field.label }}
+                        {% if field.required %}<span style="color: #ff6b6b">*</span>{% endif %}
+                    </label>
+                    {% endif %}
+
+                    {% if field.type == 'select' %}
+                    <select name="{{ field.name }}"
+                            id="{{ field.name }}"
+                            {% if field.required %}required{% endif %}
+                            style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+                        {% if field.placeholder %}
+                        <option value="" disabled selected>{{ field.placeholder }}</option>
+                        {% endif %}
+                        {% for option in field.options %}
+                        <option value="{{ option.value }}">{{ option.label }}</option>
+                        {% endfor %}
+                    </select>
+
+                    {% elif field.type == 'textarea' %}
+                    <textarea name="{{ field.name }}"
+                              {% if field.placeholder %}placeholder="{{ field.placeholder }}"{% endif %}
+                              {% if field.rows %}rows="{{ field.rows }}"{% endif %}
+                              {% if field.required %}required{% endif %}
+                              style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem; font-family: inherit;"></textarea>
+
+                    {% else %}
+                    <input type="{{ field.type }}"
+                           name="{{ field.name }}"
+                           {% if field.placeholder %}placeholder="{{ field.placeholder }}"{% endif %}
+                           {% if field.min %}min="{{ field.min }}"{% endif %}
+                           {% if field.max %}max="{{ field.max }}"{% endif %}
+                           {% if field.step %}step="{{ field.step }}"{% endif %}
+                           {% if field.value %}value="{{ field.value }}"{% endif %}
+                           {% if field.pattern %}pattern="{{ field.pattern }}"{% endif %}
+                           {% if field.title %}title="{{ field.title }}"{% endif %}
+                           {% if field.required %}required{% endif %}
+                           style="width: 100%; padding: 0.75rem 1rem; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 1rem;">
+                    {% endif %}
+
+                    {% if field.help_text %}
+                    <small style="display: block; margin-top: 0.5rem; color: #666; font-size: 0.9rem;">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="query-btn" style="flex: 1;">Отправить</button>
+                </div>
+            </form>
+
+
+                <a href="{{ url_for('query_bp.cinema_handle') }}" class="back-button">Назад к запросам</a>
+                <a href="{{ url_for('main_menu') }}" class="exit-btn">Назад в главное меню</a>
+
+        </div>
+    </div>
+</body>
+</html>
