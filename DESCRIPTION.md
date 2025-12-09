@@ -1,3 +1,5 @@
+```Описание базы данных```<br>
+
 ```Hall```<br>
 
 | h_id | hall_name | seats_count |
